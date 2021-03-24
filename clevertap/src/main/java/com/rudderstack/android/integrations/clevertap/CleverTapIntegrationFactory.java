@@ -18,9 +18,6 @@ import com.rudderstack.android.sdk.core.RudderIntegration;
 import com.rudderstack.android.sdk.core.RudderLogger;
 import com.rudderstack.android.sdk.core.RudderMessage;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,23 +28,29 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 public class CleverTapIntegrationFactory
         extends RudderIntegration<CleverTapAPI> {
 
     private static final String CLEVERTAP_KEY = "CleverTap";
     private final CleverTapAPI cleverTap;
 
-    private final HashMap<String, String> CLEVERTAP_TRAITS_MAPPING = new HashMap<String, String>() {{
-        put("name", "Name");
-        put("phone", "Phone");
-        put("email", "Email");
-        put("id", "Identity");
-    }};
-    private final Set<String> MALE_KEYS = new HashSet<>(Arrays.asList("M",
-            "MALE"));
-    private final Set<String> FEMALE_KEYS = new HashSet<>(Arrays.asList("F",
-            "FEMALE"));
-
+    private final HashMap<String, String> CLEVERTAP_TRAITS_MAPPING = new HashMap<String, String>() {
+        {
+            put("name", "Name");
+            put("phone", "Phone");
+            put("email", "Email");
+            put("id", "Identity");
+        }
+    };
+    private final Set<String> MALE_KEYS = new HashSet<>(
+            Arrays.asList("M", "MALE")
+    );
+    private final Set<String> FEMALE_KEYS = new HashSet<>(
+            Arrays.asList("F", "FEMALE")
+    );
 
     public static Factory FACTORY = new Factory() {
         @Override
@@ -67,50 +70,69 @@ public class CleverTapIntegrationFactory
 
     private CleverTapIntegrationFactory(Object config) {
         Gson gson = new Gson();
-        CleverTapDestinationConfig destinationConfig = gson.fromJson(gson.toJson(config), CleverTapDestinationConfig.class);
+        CleverTapDestinationConfig destinationConfig = gson.fromJson(
+                gson.toJson(config),
+                CleverTapDestinationConfig.class
+        );
         if (!destinationConfig.region.equals("none")) {
-            CleverTapAPI.changeCredentials(destinationConfig.accountId, destinationConfig.passcode, destinationConfig.region);
+            CleverTapAPI.changeCredentials(
+                    destinationConfig.accountId,
+                    destinationConfig.passcode,
+                    destinationConfig.region
+            );
         } else {
-            CleverTapAPI.changeCredentials(destinationConfig.accountId, destinationConfig.passcode);
+            CleverTapAPI.changeCredentials(
+                    destinationConfig.accountId,
+                    destinationConfig.passcode
+            );
         }
         cleverTap = CleverTapAPI.getDefaultInstance(RudderClient.getApplication());
         RudderLogger.logInfo("Initialized Clever Tap SDK");
 
-        RudderClient.getApplication().registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
-            @Override
-            public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-            }
+        RudderClient
+                .getApplication()
+                .registerActivityLifecycleCallbacks(
+                        new Application.ActivityLifecycleCallbacks() {
+                            @Override
+                            public void onActivityCreated(
+                                    Activity activity,
+                                    Bundle savedInstanceState
+                            ) {
+                            }
 
-            @Override
-            public void onActivityResumed(Activity activity) {
-            }
+                            @Override
+                            public void onActivityResumed(Activity activity) {
+                            }
 
-            @Override
-            public void onActivityPaused(Activity activity) {
-            }
+                            @Override
+                            public void onActivityPaused(Activity activity) {
+                            }
 
-            @SuppressLint("RestrictedApi")
-            @Override
-            public void onActivityStopped(@NonNull Activity activity) {
-            }
+                            @SuppressLint("RestrictedApi")
+                            @Override
+                            public void onActivityStopped(@NonNull Activity activity) {
+                            }
 
-            @Override
-            public void onActivitySaveInstanceState(@NonNull Activity activity, @Nullable Bundle bundle) {
-            }
+                            @Override
+                            public void onActivitySaveInstanceState(
+                                    @NonNull Activity activity,
+                                    @Nullable Bundle bundle
+                            ) {
+                            }
 
-            @Override
-            public void onActivityDestroyed(@NonNull Activity activity) {
-            }
+                            @Override
+                            public void onActivityDestroyed(@NonNull Activity activity) {
+                            }
 
-            @SuppressLint("RestrictedApi")
-            @Override
-            public void onActivityStarted(@NonNull Activity activity) {
-            }
-        });
-
+                            @SuppressLint("RestrictedApi")
+                            @Override
+                            public void onActivityStarted(@NonNull Activity activity) {
+                            }
+                        }
+                );
     }
-//  handling life cycle methods of an Application
 
+    //  handling life cycle methods of an Application
 
     private void processRudderEvent(RudderMessage element) {
         String type = element.getType();
@@ -132,7 +154,9 @@ public class CleverTapIntegrationFactory
                     try {
                         if (eventName != null) {
                             Map<String, Object> eventProperties = element.getProperties();
-                            if (eventName.equals("Order Completed") && eventProperties != null) {
+                            if (
+                                    eventName.equals("Order Completed") && eventProperties != null
+                            ) {
                                 handleEcommerceEvent(eventProperties);
                                 return;
                             }
@@ -150,7 +174,10 @@ public class CleverTapIntegrationFactory
                     String screenName = element.getEventName();
                     Map<String, Object> screenProperties = element.getProperties();
                     if (screenProperties != null) {
-                        cleverTap.pushEvent(String.format("Viewed %s screen", screenName), screenProperties);
+                        cleverTap.pushEvent(
+                                String.format("Viewed %s screen", screenName),
+                                screenProperties
+                        );
                         return;
                     }
                     cleverTap.pushEvent(String.format("Viewed %s screen", screenName));
@@ -161,7 +188,6 @@ public class CleverTapIntegrationFactory
             }
         }
     }
-
 
     @Override
     public void reset() {
@@ -188,13 +214,15 @@ public class CleverTapIntegrationFactory
     }
 
     private Map<String, Object> transformTraits(Map<String, Object> traits) {
-
         Map<String, Object> transformedTraits = new HashMap<>();
 
         if (traits != null) {
             for (Map.Entry<String, Object> entry : traits.entrySet()) {
                 if (CLEVERTAP_TRAITS_MAPPING.containsKey(entry.getKey())) {
-                    transformedTraits.put(CLEVERTAP_TRAITS_MAPPING.get(entry.getKey()), entry.getValue());
+                    transformedTraits.put(
+                            CLEVERTAP_TRAITS_MAPPING.get(entry.getKey()),
+                            entry.getValue()
+                    );
                     continue;
                 }
                 transformedTraits.put(entry.getKey(), entry.getValue());
@@ -202,9 +230,17 @@ public class CleverTapIntegrationFactory
         }
 
         if (transformedTraits.containsKey("gender")) {
-            if (MALE_KEYS.contains(((String) transformedTraits.get("gender")).toUpperCase())) {
+            if (
+                    MALE_KEYS.contains(
+                            ((String) transformedTraits.get("gender")).toUpperCase()
+                    )
+            ) {
                 transformedTraits.put("Gender", "M");
-            } else if (FEMALE_KEYS.contains(((String) transformedTraits.get("gender")).toUpperCase())) {
+            } else if (
+                    FEMALE_KEYS.contains(
+                            ((String) transformedTraits.get("gender")).toUpperCase()
+                    )
+            ) {
                 transformedTraits.put("Gender", "F");
             }
             transformedTraits.remove("gender");
@@ -237,7 +273,7 @@ public class CleverTapIntegrationFactory
             eventProperties.remove("revenue");
         }
         if (eventProperties.containsKey("order_id")) {
-            chargeDetails.put("Charged ID", (String) eventProperties.get("order_id"));
+            chargeDetails.put("Charged ID", eventProperties.get("order_id"));
             eventProperties.remove("order_id");
         }
         for (Map.Entry<String, Object> entry : eventProperties.entrySet()) {
@@ -249,13 +285,14 @@ public class CleverTapIntegrationFactory
         cleverTap.pushChargedEvent(chargeDetails, items);
     }
 
-
     private double getRevenue(Object val) {
         String str = String.valueOf(val);
         return Double.valueOf(str);
     }
 
-    private ArrayList<HashMap<String, Object>> getProductsList(Map<String, Object> eventProperties) {
+    private ArrayList<HashMap<String, Object>> getProductsList(
+            Map<String, Object> eventProperties
+    ) {
         JSONArray products = null;
         ArrayList<HashMap<String, Object>> productsList = new ArrayList<>();
         if (eventProperties != null) {
@@ -268,18 +305,20 @@ public class CleverTapIntegrationFactory
                 for (int i = 0; i < products.length(); i++) {
                     JSONObject product = (JSONObject) products.get(i);
                     HashMap<String, Object> item = new HashMap<>();
-                    if (product.get("productId") != null) {
+                    if (product.has("productId") && product.get("productId") != null) {
                         item.put("id", product.get("productId"));
-                    } else if (product.get("product_id") != null) {
+                    } else if (
+                            product.has("product_id") && product.get("product_id") != null
+                    ) {
                         item.put("id", product.get("product_id"));
                     }
-                    if (product.get("name") != null) {
+                    if (product.has("name") && product.get("name") != null) {
                         item.put("name", product.get("name"));
                     }
-                    if (product.get("sku") != null) {
+                    if (product.has("sku") && product.get("sku") != null) {
                         item.put("sku", product.get("sku"));
                     }
-                    if (product.get("price") != null) {
+                    if (product.has("price") && product.get("price") != null) {
                         item.put("price", product.get("price"));
                     }
                     productsList.add(item);
