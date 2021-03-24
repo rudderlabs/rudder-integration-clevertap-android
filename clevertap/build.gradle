@@ -41,6 +41,8 @@ dependencies {
     implementation 'androidx.annotation:annotation:1.1.0'
     // rudder core sdk
     compileOnly 'com.rudderstack.android.sdk:core:1.+'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.clevertap.android:clevertap-android-sdk:4.0.0'
 }
 
 apply from: './maven.gradle'
