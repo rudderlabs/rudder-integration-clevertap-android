@@ -249,26 +249,34 @@ public class CleverTapIntegrationFactory
         }
 
         if (transformedTraits.containsKey("gender")) {
-            if (
-                    MALE_KEYS.contains(
-                            ((String) transformedTraits.get("gender")).toUpperCase()
-                    )
-            ) {
-                transformedTraits.put("Gender", "M");
-            } else if (
-                    FEMALE_KEYS.contains(
-                            ((String) transformedTraits.get("gender")).toUpperCase()
-                    )
-            ) {
-                transformedTraits.put("Gender", "F");
-            }
+             if(transformedTraits.get("gender") instanceof  String) {
+                 if (
+                         MALE_KEYS.contains(
+                                 ((String) transformedTraits.get("gender")).toUpperCase()
+                         )
+                 ) {
+                     transformedTraits.put("Gender", "M");
+                 } else if (
+                         FEMALE_KEYS.contains(
+                                 ((String) transformedTraits.get("gender")).toUpperCase()
+                         )
+                 ) {
+                     transformedTraits.put("Gender", "F");
+                 }
+             }
             transformedTraits.remove("gender");
         }
 
         if (transformedTraits.containsKey("birthday")) {
-            Date DOB = dateFromString((String) transformedTraits.get("birthday"));
-            if (DOB != null) {
-                transformedTraits.put("DOB", DOB);
+            if(transformedTraits.get("birthday") instanceof  Date)
+            {
+                transformedTraits.put("DOB", transformedTraits.get("birthday"));
+            }
+            else if(transformedTraits.get("birthday") instanceof String) {
+                Date DOB = dateFromString((String) transformedTraits.get("birthday"));
+                if (DOB != null) {
+                    transformedTraits.put("DOB", DOB);
+                }
             }
             transformedTraits.remove("birthday");
         }
@@ -305,8 +313,11 @@ public class CleverTapIntegrationFactory
     }
 
     private double getRevenue(Object val) {
-        String str = String.valueOf(val);
-        return Double.valueOf(str);
+        if(val != null) {
+            String str = String.valueOf(val);
+            return Double.valueOf(str);
+        }
+        return 0;
     }
 
     private ArrayList<HashMap<String, Object>> getProductsList(
