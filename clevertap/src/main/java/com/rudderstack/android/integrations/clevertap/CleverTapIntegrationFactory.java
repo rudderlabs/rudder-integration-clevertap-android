@@ -3,6 +3,8 @@ package com.rudderstack.android.integrations.clevertap;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 
@@ -117,19 +119,43 @@ public class CleverTapIntegrationFactory
                                     Activity activity,
                                     Bundle savedInstanceState
                             ) {
+                                if (cleverTap == null) return;
+                                CleverTapAPI.setAppForeground(true);
+                                try {
+                                    cleverTap.pushNotificationClickedEvent(activity.getIntent().getExtras());
+                                } catch (Exception e) {
+                                }
+
+                                try {
+                                    Intent intent = activity.getIntent();
+                                    Uri data = intent.getData();
+                                    cleverTap.pushDeepLink(data);
+                                } catch (Exception e) {
+                                }
                             }
 
                             @Override
                             public void onActivityResumed(Activity activity) {
+                                if (cleverTap == null) return;
+                                try {
+                                    CleverTapAPI.onActivityResumed(activity);
+                                } catch (Exception e) {
+                                }
                             }
 
                             @Override
                             public void onActivityPaused(Activity activity) {
+                                if (cleverTap == null) return;
+                                try {
+                                    CleverTapAPI.onActivityPaused();
+                                } catch (Exception e) {
+                                }
                             }
 
                             @SuppressLint("RestrictedApi")
                             @Override
                             public void onActivityStopped(@NonNull Activity activity) {
+                                // Nothing to Implement
                             }
 
                             @Override
@@ -137,15 +163,18 @@ public class CleverTapIntegrationFactory
                                     @NonNull Activity activity,
                                     @Nullable Bundle bundle
                             ) {
+                                // Nothing to implement
                             }
 
                             @Override
                             public void onActivityDestroyed(@NonNull Activity activity) {
+                                // Nothing to implement
                             }
 
                             @SuppressLint("RestrictedApi")
                             @Override
                             public void onActivityStarted(@NonNull Activity activity) {
+                                // Nothing to implement
                             }
                         }
                 );
@@ -249,30 +278,28 @@ public class CleverTapIntegrationFactory
         }
 
         if (transformedTraits.containsKey("gender")) {
-             if(transformedTraits.get("gender") instanceof  String) {
-                 if (
-                         MALE_KEYS.contains(
-                                 ((String) transformedTraits.get("gender")).toUpperCase()
-                         )
-                 ) {
-                     transformedTraits.put("Gender", "M");
-                 } else if (
-                         FEMALE_KEYS.contains(
-                                 ((String) transformedTraits.get("gender")).toUpperCase()
-                         )
-                 ) {
-                     transformedTraits.put("Gender", "F");
-                 }
-             }
+            if (transformedTraits.get("gender") instanceof String) {
+                if (
+                        MALE_KEYS.contains(
+                                ((String) transformedTraits.get("gender")).toUpperCase()
+                        )
+                ) {
+                    transformedTraits.put("Gender", "M");
+                } else if (
+                        FEMALE_KEYS.contains(
+                                ((String) transformedTraits.get("gender")).toUpperCase()
+                        )
+                ) {
+                    transformedTraits.put("Gender", "F");
+                }
+            }
             transformedTraits.remove("gender");
         }
 
         if (transformedTraits.containsKey("birthday")) {
-            if(transformedTraits.get("birthday") instanceof  Date)
-            {
+            if (transformedTraits.get("birthday") instanceof Date) {
                 transformedTraits.put("DOB", transformedTraits.get("birthday"));
-            }
-            else if(transformedTraits.get("birthday") instanceof String) {
+            } else if (transformedTraits.get("birthday") instanceof String) {
                 Date DOB = dateFromString((String) transformedTraits.get("birthday"));
                 if (DOB != null) {
                     transformedTraits.put("DOB", DOB);
@@ -313,7 +340,7 @@ public class CleverTapIntegrationFactory
     }
 
     private double getRevenue(Object val) {
-        if(val != null) {
+        if (val != null) {
             String str = String.valueOf(val);
             return Double.valueOf(str);
         }
