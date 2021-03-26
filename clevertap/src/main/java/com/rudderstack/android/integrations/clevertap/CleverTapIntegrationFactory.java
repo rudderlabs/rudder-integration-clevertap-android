@@ -59,7 +59,7 @@ public class CleverTapIntegrationFactory
                 RudderClient client,
                 RudderConfig rudderConfig
         ) {
-            return new CleverTapIntegrationFactory(settings);
+            return new CleverTapIntegrationFactory(settings,rudderConfig);
         }
 
         @Override
@@ -68,7 +68,7 @@ public class CleverTapIntegrationFactory
         }
     };
 
-    private CleverTapIntegrationFactory(Object config) {
+    private CleverTapIntegrationFactory(Object config,RudderConfig rudderConfig) {
         Gson gson = new Gson();
         CleverTapDestinationConfig destinationConfig = gson.fromJson(
                 gson.toJson(config),
@@ -87,6 +87,13 @@ public class CleverTapIntegrationFactory
             );
         }
         cleverTap = CleverTapAPI.getDefaultInstance(RudderClient.getApplication());
+        if(rudderConfig.getLogLevel() >= RudderLogger.RudderLogLevel.DEBUG) {
+            CleverTapAPI.setDebugLevel(CleverTapAPI.LogLevel.DEBUG);
+        }
+        else
+        {
+            CleverTapAPI.setDebugLevel(CleverTapAPI.LogLevel.INFO);
+        }
         RudderLogger.logInfo("Initialized Clever Tap SDK");
 
         RudderClient
