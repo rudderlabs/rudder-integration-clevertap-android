@@ -35,7 +35,7 @@ public class CleverTapIntegrationFactory
         extends RudderIntegration<CleverTapAPI> {
 
     private static final String CLEVERTAP_KEY = "CleverTap";
-    private final CleverTapAPI cleverTap;
+    private CleverTapAPI cleverTap = null;
 
     private final HashMap<String, String> CLEVERTAP_TRAITS_MAPPING = new HashMap<String, String>() {
         {
@@ -59,7 +59,7 @@ public class CleverTapIntegrationFactory
                 RudderClient client,
                 RudderConfig rudderConfig
         ) {
-            return new CleverTapIntegrationFactory(settings,rudderConfig);
+            return new CleverTapIntegrationFactory(settings, rudderConfig);
         }
 
         @Override
@@ -68,30 +68,42 @@ public class CleverTapIntegrationFactory
         }
     };
 
-    private CleverTapIntegrationFactory(Object config,RudderConfig rudderConfig) {
+    private CleverTapIntegrationFactory(
+            Object config,
+            RudderConfig rudderConfig
+    ) {
+        if (RudderClient.getApplication() == null) {
+            RudderLogger.logError(
+                    "Application is null. Aborting CleverTap initialization."
+            );
+            return;
+        }
+
         Gson gson = new Gson();
         CleverTapDestinationConfig destinationConfig = gson.fromJson(
                 gson.toJson(config),
                 CleverTapDestinationConfig.class
         );
+        if (TextUtils.isEmpty(destinationConfig.accountToken)) {
+            RudderLogger.logError("Invalid CleverTap Account Token, Aborting");
+            return;
+        }
         if (!destinationConfig.region.equals("none")) {
             CleverTapAPI.changeCredentials(
                     destinationConfig.accountId,
-                    destinationConfig.passcode,
+                    destinationConfig.accountToken,
                     destinationConfig.region
             );
         } else {
             CleverTapAPI.changeCredentials(
                     destinationConfig.accountId,
-                    destinationConfig.passcode
+                    destinationConfig.accountToken
             );
         }
         cleverTap = CleverTapAPI.getDefaultInstance(RudderClient.getApplication());
-        if(rudderConfig.getLogLevel() >= RudderLogger.RudderLogLevel.DEBUG) {
+        if (rudderConfig.getLogLevel() >= RudderLogger.RudderLogLevel.DEBUG) {
             CleverTapAPI.setDebugLevel(CleverTapAPI.LogLevel.DEBUG);
-        }
-        else
-        {
+        } else {
             CleverTapAPI.setDebugLevel(CleverTapAPI.LogLevel.INFO);
         }
         RudderLogger.logInfo("Initialized Clever Tap SDK");
