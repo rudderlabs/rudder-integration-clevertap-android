@@ -86,8 +86,8 @@ public class CleverTapIntegrationFactory
                 gson.toJson(config),
                 CleverTapDestinationConfig.class
         );
-        if (TextUtils.isEmpty(destinationConfig.accountToken)) {
-            RudderLogger.logError("Invalid CleverTap Account Token, Aborting");
+        if (TextUtils.isEmpty(destinationConfig.accountToken) || TextUtils.isEmpty(destinationConfig.accountId)) {
+            RudderLogger.logError("Invalid CleverTap Account Credentials, Aborting");
             return;
         }
         if (!destinationConfig.region.equals("none")) {
