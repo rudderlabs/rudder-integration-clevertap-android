@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 
 import com.clevertap.android.sdk.CleverTapAPI;
 import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
 import com.rudderstack.android.sdk.core.MessageType;
 import com.rudderstack.android.sdk.core.RudderClient;
 import com.rudderstack.android.sdk.core.RudderConfig;
@@ -187,14 +188,11 @@ public class CleverTapIntegrationFactory
         if (type != null) {
             switch (type) {
                 case MessageType.IDENTIFY:
-                    String userId = element.getUserId();
-                    if (!TextUtils.isEmpty(userId)) {
-                        Map<String, Object> traits = transformTraits(element.getTraits());
-                        try {
-                            cleverTap.onUserLogin(traits);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                    Map<String, Object> traits = transformTraits(element.getTraits());
+                    try {
+                        cleverTap.onUserLogin(traits);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                     break;
                 case MessageType.TRACK:
@@ -223,12 +221,12 @@ public class CleverTapIntegrationFactory
                     Map<String, Object> screenProperties = element.getProperties();
                     if (screenProperties != null) {
                         cleverTap.pushEvent(
-                                String.format("Viewed %s screen", screenName),
+                                String.format("Screen Viewed: %s", screenName),
                                 screenProperties
                         );
                         return;
                     }
-                    cleverTap.pushEvent(String.format("Viewed %s screen", screenName));
+                    cleverTap.pushEvent(String.format("Screen Viewed: %s", screenName));
                     break;
                 default:
                     RudderLogger.logWarn("MessageType is not specified or supported");
@@ -271,6 +269,23 @@ public class CleverTapIntegrationFactory
                             CLEVERTAP_TRAITS_MAPPING.get(entry.getKey()),
                             entry.getValue()
                     );
+                    continue;
+                }
+                if (entry.getKey().equals("address") || entry.getKey().equals("company")) {
+                    LinkedTreeMap<String, String> linkedMap = (LinkedTreeMap<String, String>) entry.getValue();
+                    for (Map.Entry<String, String> linkedMapEntry : linkedMap.entrySet()) {
+                        if(linkedMapEntry.getKey().equals("id"))
+                        {
+                            transformedTraits.put("companyId", linkedMapEntry.getValue());
+                            continue;
+                        }
+                        if(linkedMapEntry.getKey().equals("name"))
+                        {
+                            transformedTraits.put("companyName", linkedMapEntry.getValue());
+                            continue;
+                        }
+                        transformedTraits.put(linkedMapEntry.getKey(), linkedMapEntry.getValue());
+                    }
                     continue;
                 }
                 transformedTraits.put(entry.getKey(), entry.getValue());
