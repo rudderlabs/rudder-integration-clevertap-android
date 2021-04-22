@@ -31,9 +31,7 @@ android {
     }
 }
 
-repositories {
-    maven { url "https://dl.bintray.com/rudderstack/rudderstack" }
-}
+
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])

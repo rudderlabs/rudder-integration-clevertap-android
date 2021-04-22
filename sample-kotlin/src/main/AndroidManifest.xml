@@ -20,11 +20,11 @@
 
 <!--        <meta-data-->
 <!--            android:name="CLEVERTAP_ACCOUNT_ID"-->
-<!--            android:value="6Z8-RRZ-KZ6Z"/>-->
+<!--            android:value="XXX-XXX-XXXX"/>-->
 
 <!--        <meta-data-->
 <!--            android:name="CLEVERTAP_TOKEN"-->
-<!--            android:value="122-b16"/>-->
+<!--            android:value="XXX-XXX"/>-->
             
         <activity android:name="com.rudderstack.android.sample.kotlin.MainActivity">
             <intent-filter>
