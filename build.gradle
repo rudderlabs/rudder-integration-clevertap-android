@@ -1,18 +1,19 @@
 buildscript {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.1.2'
+        // To be added only when using the Push Notification Service of CleverTap
+        // classpath 'com.google.gms:google-services:4.3.5'
     }
 }
 
 allprojects {
     repositories {
         google()
-        jcenter()
-        
+        mavenCentral()
     }
 }
 

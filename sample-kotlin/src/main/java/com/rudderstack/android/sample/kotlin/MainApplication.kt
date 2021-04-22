@@ -8,9 +8,8 @@ import com.rudderstack.android.sdk.core.RudderLogger
 
 class MainApplication : Application() {
     companion object {
-        private const val WRITE_KEY = "1ZIkdsNVvxrUC7bRGOorIxmJVEH"
-        private const val DATA_PLANE_URL = "http://localhost:8080"
-        private const val CONTROL_PLANE_URL = "http://localhost:5000"
+        private const val WRITE_KEY = "1qIlf7JB5aMuiQbOuJeb9vzXuWK"
+        private const val CONTROL_PLANE_URL = "https://c7d361b63320.ngrok.io"
         lateinit var rudderClient: RudderClient
     }
 
@@ -20,8 +19,8 @@ class MainApplication : Application() {
             this,
             WRITE_KEY,
             RudderConfig.Builder()
-                .withDataPlaneUrl(DATA_PLANE_URL)
                 .withControlPlaneUrl(CONTROL_PLANE_URL)
+                .withTrackLifecycleEvents(false)
                 .withFactory(CleverTapIntegrationFactory.FACTORY)
                 .withLogLevel(RudderLogger.RudderLogLevel.VERBOSE)
                 .build()

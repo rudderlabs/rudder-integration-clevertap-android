@@ -31,9 +31,7 @@ android {
     }
 }
 
-repositories {
-    maven { url "https://dl.bintray.com/rudderstack/rudderstack" }
-}
+
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -49,4 +47,11 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    implementation 'com.android.installreferrer:installreferrer:2.1'
+    // To be added only when using the Push Notification Service of CleverTap
+    // implementation 'com.clevertap.android:clevertap-android-sdk:4.0.0'
+    // implementation 'com.google.firebase:firebase-messaging:20.2.4'
+
 }
+// To be added only when using the Push Notification Service of CleverTap
+// apply plugin: 'com.google.gms.google-services'

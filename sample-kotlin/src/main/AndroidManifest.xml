@@ -10,6 +10,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+<!-- For configuring push notifications-->
+<!--        <service-->
+<!--            android:name="com.clevertap.android.sdk.pushnotification.fcm.FcmMessageListenerService">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="com.google.firebase.MESSAGING_EVENT"/>-->
+<!--            </intent-filter>-->
+<!--        </service>-->
+
+<!--        <meta-data-->
+<!--            android:name="CLEVERTAP_ACCOUNT_ID"-->
+<!--            android:value="XXX-XXX-XXXX"/>-->
+
+<!--        <meta-data-->
+<!--            android:name="CLEVERTAP_TOKEN"-->
+<!--            android:value="XXX-XXX"/>-->
+            
         <activity android:name="com.rudderstack.android.sample.kotlin.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
