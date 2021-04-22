@@ -34,9 +34,7 @@ import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class CleverTapIntegrationFactory
-        extends RudderIntegration<CleverTapAPI> {
-
+public class CleverTapIntegrationFactory extends RudderIntegration<CleverTapAPI> {
     private static final String CLEVERTAP_KEY = "CleverTap";
     private CleverTapAPI cleverTap = null;
 
@@ -76,9 +74,7 @@ public class CleverTapIntegrationFactory
             RudderConfig rudderConfig
     ) {
         if (RudderClient.getApplication() == null) {
-            RudderLogger.logError(
-                    "Application is null. Aborting CleverTap initialization."
-            );
+            RudderLogger.logError("Application is null. Aborting CleverTap initialization.");
             return;
         }
 
@@ -103,7 +99,7 @@ public class CleverTapIntegrationFactory
                     destinationConfig.accountToken
             );
         }
-        cleverTap = CleverTapAPI.getDefaultInstance(RudderClient.getApplication());
+        this.cleverTap = CleverTapAPI.getDefaultInstance(RudderClient.getApplication());
         if (rudderConfig.getLogLevel() >= RudderLogger.RudderLogLevel.DEBUG) {
             CleverTapAPI.setDebugLevel(CleverTapAPI.LogLevel.DEBUG);
         } else {
@@ -120,11 +116,15 @@ public class CleverTapIntegrationFactory
                                     Activity activity,
                                     Bundle savedInstanceState
                             ) {
-                                if (cleverTap == null) return;
+                                if (cleverTap == null) {
+                                    return;
+                                }
+
                                 CleverTapAPI.setAppForeground(true);
                                 try {
                                     cleverTap.pushNotificationClickedEvent(activity.getIntent().getExtras());
                                 } catch (Exception e) {
+                                    RudderLogger.logError(e);
                                 }
 
                                 try {
@@ -132,24 +132,31 @@ public class CleverTapIntegrationFactory
                                     Uri data = intent.getData();
                                     cleverTap.pushDeepLink(data);
                                 } catch (Exception e) {
+                                    RudderLogger.logError(e);
                                 }
                             }
 
                             @Override
                             public void onActivityResumed(Activity activity) {
-                                if (cleverTap == null) return;
+                                if (cleverTap == null) {
+                                    return;
+                                }
                                 try {
                                     CleverTapAPI.onActivityResumed(activity);
                                 } catch (Exception e) {
+                                    RudderLogger.logError(e);
                                 }
                             }
 
                             @Override
                             public void onActivityPaused(Activity activity) {
-                                if (cleverTap == null) return;
+                                if (cleverTap == null) {
+                                    return;
+                                }
                                 try {
                                     CleverTapAPI.onActivityPaused();
                                 } catch (Exception e) {
+                                    RudderLogger.logError(e);
                                 }
                             }
 
@@ -182,7 +189,6 @@ public class CleverTapIntegrationFactory
     }
 
     //  handling life cycle methods of an Application
-
     private void processRudderEvent(RudderMessage element) {
         String type = element.getType();
         if (type != null) {
@@ -190,9 +196,9 @@ public class CleverTapIntegrationFactory
                 case MessageType.IDENTIFY:
                     Map<String, Object> traits = transformTraits(element.getTraits());
                     try {
-                        cleverTap.onUserLogin(traits);
+                        this.cleverTap.onUserLogin(traits);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        RudderLogger.logError(e);
                     }
                     break;
                 case MessageType.TRACK:
@@ -203,30 +209,30 @@ public class CleverTapIntegrationFactory
                             if (
                                     eventName.equals("Order Completed") && eventProperties != null
                             ) {
-                                handleEcommerceEvent(eventProperties);
+                                handleECommerceEvent(eventProperties);
                                 return;
                             }
                             if (eventProperties == null || eventProperties.size() == 0) {
-                                cleverTap.pushEvent(eventName);
+                                this.cleverTap.pushEvent(eventName);
                                 return;
                             }
-                            cleverTap.pushEvent(eventName, eventProperties);
+                            this.cleverTap.pushEvent(eventName, eventProperties);
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        RudderLogger.logError(e);
                     }
                     break;
                 case MessageType.SCREEN:
                     String screenName = element.getEventName();
                     Map<String, Object> screenProperties = element.getProperties();
                     if (screenProperties != null) {
-                        cleverTap.pushEvent(
+                        this.cleverTap.pushEvent(
                                 String.format("Screen Viewed: %s", screenName),
                                 screenProperties
                         );
                         return;
                     }
-                    cleverTap.pushEvent(String.format("Screen Viewed: %s", screenName));
+                    this.cleverTap.pushEvent(String.format("Screen Viewed: %s", screenName));
                     break;
                 default:
                     RudderLogger.logWarn("MessageType is not specified or supported");
@@ -237,12 +243,13 @@ public class CleverTapIntegrationFactory
 
     @Override
     public void reset() {
+        // nothing to do
     }
 
     @Override
     public void dump(@Nullable RudderMessage element) {
         try {
-            if (cleverTap == null) {
+            if (this.cleverTap == null) {
                 RudderLogger.logDebug("CleverTap instance is null");
                 return;
             }
@@ -261,7 +268,6 @@ public class CleverTapIntegrationFactory
 
     private Map<String, Object> transformTraits(Map<String, Object> traits) {
         Map<String, Object> transformedTraits = new HashMap<>();
-
         if (traits != null) {
             for (Map.Entry<String, Object> entry : traits.entrySet()) {
                 if (CLEVERTAP_TRAITS_MAPPING.containsKey(entry.getKey())) {
@@ -274,13 +280,11 @@ public class CleverTapIntegrationFactory
                 if (entry.getKey().equals("address") || entry.getKey().equals("company")) {
                     LinkedTreeMap<String, String> linkedMap = (LinkedTreeMap<String, String>) entry.getValue();
                     for (Map.Entry<String, String> linkedMapEntry : linkedMap.entrySet()) {
-                        if(linkedMapEntry.getKey().equals("id"))
-                        {
+                        if (linkedMapEntry.getKey().equals("id")) {
                             transformedTraits.put("companyId", linkedMapEntry.getValue());
                             continue;
                         }
-                        if(linkedMapEntry.getKey().equals("name"))
-                        {
+                        if (linkedMapEntry.getKey().equals("name")) {
                             transformedTraits.put("companyName", linkedMapEntry.getValue());
                             continue;
                         }
@@ -294,21 +298,16 @@ public class CleverTapIntegrationFactory
 
         if (transformedTraits.containsKey("gender")) {
             if (transformedTraits.get("gender") instanceof String) {
-                if (
-                        MALE_KEYS.contains(
-                                ((String) transformedTraits.get("gender")).toUpperCase()
-                        )
-                ) {
-                    transformedTraits.put("Gender", "M");
-                } else if (
-                        FEMALE_KEYS.contains(
-                                ((String) transformedTraits.get("gender")).toUpperCase()
-                        )
-                ) {
-                    transformedTraits.put("Gender", "F");
+                String gender = (String) transformedTraits.get("gender");
+                if (gender != null) {
+                    if (MALE_KEYS.contains(gender.toUpperCase())) {
+                        transformedTraits.put("Gender", "M");
+                    } else if (FEMALE_KEYS.contains(gender.toUpperCase())) {
+                        transformedTraits.put("Gender", "F");
+                    }
                 }
+                transformedTraits.remove("gender");
             }
-            transformedTraits.remove("gender");
         }
 
         if (transformedTraits.containsKey("birthday")) {
@@ -331,33 +330,37 @@ public class CleverTapIntegrationFactory
         try {
             return formatter.parse(date);
         } catch (Exception e) {
+            RudderLogger.logError(e);
             return null;
         }
     }
 
-    private void handleEcommerceEvent(Map<String, Object> eventProperties) {
+    private void handleECommerceEvent(Map<String, Object> eventProperties) {
         HashMap<String, Object> chargeDetails = new HashMap<>();
         if (eventProperties.containsKey("revenue")) {
             chargeDetails.put("Amount", getRevenue(eventProperties.get("revenue")));
             eventProperties.remove("revenue");
         }
+
         if (eventProperties.containsKey("order_id")) {
             chargeDetails.put("Charged ID", eventProperties.get("order_id"));
             eventProperties.remove("order_id");
         }
+
         for (Map.Entry<String, Object> entry : eventProperties.entrySet()) {
             if (!entry.getKey().equals("products")) {
                 chargeDetails.put(entry.getKey(), entry.getValue());
             }
         }
+
         ArrayList<HashMap<String, Object>> items = getProductsList(eventProperties);
-        cleverTap.pushChargedEvent(chargeDetails, items);
+        this.cleverTap.pushChargedEvent(chargeDetails, items);
     }
 
     private double getRevenue(Object val) {
         if (val != null) {
             String str = String.valueOf(val);
-            return Double.valueOf(str);
+            return Double.parseDouble(str);
         }
         return 0;
     }
@@ -377,27 +380,41 @@ public class CleverTapIntegrationFactory
                 for (int i = 0; i < products.length(); i++) {
                     JSONObject product = (JSONObject) products.get(i);
                     HashMap<String, Object> item = new HashMap<>();
-                    if (product.has("productId") && product.get("productId") != null) {
+
+                    // productId
+                    if (product.has("productId")) {
                         item.put("id", product.get("productId"));
-                    } else if (
-                            product.has("product_id") && product.get("product_id") != null
-                    ) {
-                        item.put("id", product.get("product_id"));
+                    } else {
+                        if (product.has("product_id")) {
+                            product.get("product_id");
+                            item.put("id", product.get("product_id"));
+                        }
                     }
-                    if (product.has("name") && product.get("name") != null) {
+
+                    // product name
+                    if (product.has("name")) {
+                        product.get("name");
                         item.put("name", product.get("name"));
                     }
-                    if (product.has("sku") && product.get("sku") != null) {
+
+                    // SKU
+                    if (product.has("sku")) {
+                        product.get("sku");
                         item.put("sku", product.get("sku"));
                     }
-                    if (product.has("price") && product.get("price") != null) {
+
+                    // price
+                    if (product.has("price")) {
+                        product.get("price");
                         item.put("price", product.get("price"));
                     }
+
+                    // finally add the product
                     productsList.add(item);
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            RudderLogger.logError(e);
         }
         return productsList;
     }
