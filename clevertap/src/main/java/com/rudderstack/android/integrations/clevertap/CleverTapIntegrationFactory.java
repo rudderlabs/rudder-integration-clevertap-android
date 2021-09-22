@@ -24,9 +24,11 @@ import com.rudderstack.android.sdk.core.RudderMessage;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -419,12 +421,19 @@ public class CleverTapIntegrationFactory extends RudderIntegration<CleverTapAPI>
         return productsList;
     }
 
-    private JSONArray getJSONArray(Object object) {
+    private JSONArray getJSONArray(@Nullable Object object) {
         if (object instanceof JSONArray) {
             return (JSONArray) object;
-        } else {
-            // if the object received was ArrayList
-            return new JSONArray((ArrayList) object);
         }
+        if(object instanceof List){
+            ArrayList<Object> arrayList = new ArrayList<>((Collection<?>) object);
+            return new JSONArray(arrayList);
+        }
+        try {
+            return new JSONArray((ArrayList) object);
+        } catch (Exception e) {
+            RudderLogger.logDebug("Error while converting the products array to JSONArray type");
+        }
+        return null;
     }
 }
