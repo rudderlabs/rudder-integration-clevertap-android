@@ -422,6 +422,9 @@ public class CleverTapIntegrationFactory extends RudderIntegration<CleverTapAPI>
     }
 
     private JSONArray getJSONArray(@Nullable Object object) {
+        if (object == null) {
+            return null;
+        }
         if (object instanceof JSONArray) {
             return (JSONArray) object;
         }
