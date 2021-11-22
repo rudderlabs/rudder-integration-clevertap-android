@@ -16,7 +16,7 @@ signing {
 
 group = 'com.rudderstack.android.integration'
 archivesBaseName = 'clevertap'
-version = '1.0.0'
+version = '1.0.1'
 
 File secretPropsFile = project.rootProject.file('local.properties')
 if (secretPropsFile.exists()) {

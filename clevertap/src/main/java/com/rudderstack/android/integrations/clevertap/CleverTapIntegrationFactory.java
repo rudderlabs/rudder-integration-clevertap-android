@@ -24,14 +24,18 @@ import com.rudderstack.android.sdk.core.RudderMessage;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class CleverTapIntegrationFactory extends RudderIntegration<CleverTapAPI> {
@@ -206,13 +210,11 @@ public class CleverTapIntegrationFactory extends RudderIntegration<CleverTapAPI>
                     try {
                         if (eventName != null) {
                             Map<String, Object> eventProperties = element.getProperties();
-                            if (
-                                    eventName.equals("Order Completed") && eventProperties != null
-                            ) {
+                            if (eventName.equals("Order Completed") && !isEmpty(eventProperties)) {
                                 handleECommerceEvent(eventProperties);
                                 return;
                             }
-                            if (eventProperties == null || eventProperties.size() == 0) {
+                            if (isEmpty(eventProperties)) {
                                 this.cleverTap.pushEvent(eventName);
                                 return;
                             }
@@ -225,7 +227,7 @@ public class CleverTapIntegrationFactory extends RudderIntegration<CleverTapAPI>
                 case MessageType.SCREEN:
                     String screenName = element.getEventName();
                     Map<String, Object> screenProperties = element.getProperties();
-                    if (screenProperties != null) {
+                    if (!isEmpty(screenProperties)) {
                         this.cleverTap.pushEvent(
                                 String.format("Screen Viewed: %s", screenName),
                                 screenProperties
@@ -339,20 +341,15 @@ public class CleverTapIntegrationFactory extends RudderIntegration<CleverTapAPI>
         HashMap<String, Object> chargeDetails = new HashMap<>();
         if (eventProperties.containsKey("revenue")) {
             chargeDetails.put("Amount", getRevenue(eventProperties.get("revenue")));
-            eventProperties.remove("revenue");
         }
-
         if (eventProperties.containsKey("order_id")) {
             chargeDetails.put("Charged ID", eventProperties.get("order_id"));
-            eventProperties.remove("order_id");
         }
-
         for (Map.Entry<String, Object> entry : eventProperties.entrySet()) {
-            if (!entry.getKey().equals("products")) {
+            if (!entry.getKey().equals("products") && !entry.getKey().equals("revenue") && !entry.getKey().equals("order_id") ) {
                 chargeDetails.put(entry.getKey(), entry.getValue());
             }
         }
-
         ArrayList<HashMap<String, Object>> items = getProductsList(eventProperties);
         this.cleverTap.pushChargedEvent(chargeDetails, items);
     }
@@ -365,66 +362,124 @@ public class CleverTapIntegrationFactory extends RudderIntegration<CleverTapAPI>
         return 0;
     }
 
-    private ArrayList<HashMap<String, Object>> getProductsList(
-            Map<String, Object> eventProperties
-    ) {
-        JSONArray products = null;
+    private ArrayList<HashMap<String, Object>> getProductsList(Map<String, Object> eventProperties) {
         ArrayList<HashMap<String, Object>> productsList = new ArrayList<>();
-        if (eventProperties != null) {
-            if (eventProperties.containsKey("products")) {
-                products = getJSONArray(eventProperties.get("products"));
-            }
-        }
-        try {
-            if (products != null && products.length() > 0) {
-                for (int i = 0; i < products.length(); i++) {
-                    JSONObject product = (JSONObject) products.get(i);
-                    HashMap<String, Object> item = new HashMap<>();
+        if (eventProperties.containsKey("products")) {
+            try {
+                JSONArray products = getProductsJSONArray(eventProperties.get("products"));
+                if (!isEmpty(products)) {
+                    for (int i = 0; i < products.length(); i++) {
+                        JSONObject product = (JSONObject) products.get(i);
+                        HashMap<String, Object> item = new HashMap<>();
 
-                    // productId
-                    if (product.has("productId")) {
-                        item.put("id", product.get("productId"));
-                    } else {
-                        if (product.has("product_id")) {
-                            product.get("product_id");
-                            item.put("id", product.get("product_id"));
+                        // productId
+                        if (product.has("productId")) {
+                            item.put("id", product.get("productId"));
+                        } else {
+                            if (product.has("product_id")) {
+                                item.put("id", product.get("product_id"));
+                            }
+                        }
+
+                        // product name
+                        if (product.has("name")) {
+                            item.put("name", product.get("name"));
+                        }
+
+                        // SKU
+                        if (product.has("sku")) {
+                            item.put("sku", product.get("sku"));
+                        }
+
+                        // price
+                        if (product.has("price")) {
+                            item.put("price", product.get("price"));
+                        }
+
+                        // quantity
+                        if (product.has("quantity")) {
+                            item.put("quantity", product.get("quantity"));
+                        }
+
+                        // category
+                        if (product.has("category")) {
+                            item.put("category", product.get("category"));
+                        }
+
+                        // url
+                        if (product.has("url")) {
+                            item.put("url", product.get("url"));
+                        }
+
+                        // image_url
+                        if (product.has("image_url")) {
+                            item.put("image_url", product.get("image_url"));
+                        }
+
+                        // finally add the product
+                        if (!isEmpty(item)) {
+                            productsList.add(item);
                         }
                     }
-
-                    // product name
-                    if (product.has("name")) {
-                        product.get("name");
-                        item.put("name", product.get("name"));
-                    }
-
-                    // SKU
-                    if (product.has("sku")) {
-                        product.get("sku");
-                        item.put("sku", product.get("sku"));
-                    }
-
-                    // price
-                    if (product.has("price")) {
-                        product.get("price");
-                        item.put("price", product.get("price"));
-                    }
-
-                    // finally add the product
-                    productsList.add(item);
                 }
+            } catch (Exception e) {
+                RudderLogger.logError(e);
             }
-        } catch (Exception e) {
-            RudderLogger.logError(e);
         }
         return productsList;
     }
 
-    private JSONArray getJSONArray(Object object) {
+    private JSONArray getProductsJSONArray(Object object) {
+        if (object == null) {
+            return null;
+        }
         if (object instanceof JSONArray) {
             return (JSONArray) object;
-        } else {
-            // if the object received was ArrayList
-            return new JSONArray((ArrayList) object);
         }
+        if (object instanceof List){
+            ArrayList<Object> arrayList = new ArrayList<>((Collection<?>) object);
+            return new JSONArray(arrayList);
+        }
+        if (object instanceof LinkedHashMap) {
+            LinkedHashMap product = (LinkedHashMap) object;
+            JSONObject productJsonObject = new JSONObject();
+            for (Object key: product.keySet()) {
+                try {
+                    productJsonObject.put((String) key, product.get(key));
+                } catch (JSONException e) {
+                    RudderLogger.logDebug("Error while converting the Products value to JSONArray type");
+                }
+            }
+            if (!isEmpty(productJsonObject)) {
+                return new JSONArray().put(productJsonObject);
+            }
+            return null;
+        }
+        try {
+            return new JSONArray((ArrayList) object);
+        } catch (Exception e) {
+            RudderLogger.logDebug("Error while converting the products: "+ object +" to JSONArray type");
+        }
+        return null;
     }
+
+    public static boolean isEmpty(Object value) {
+        if(value == null){
+            return true;
+        }
+        if (value instanceof String) {
+            return (((String) value).trim().isEmpty());
+        }
+        if (value instanceof JSONArray) {
+            return (((JSONArray) value).length() == 0);
+        }
+        if (value instanceof JSONObject) {
+            return (((JSONObject) value).length() == 0);
+        }
+        if (value instanceof Map) {
+            return ((Map<?, ?>) value).size() == 0;
+        }
+        return false;
+    }
+
 }
