@@ -416,6 +416,11 @@ public class CleverTapIntegrationFactory extends RudderIntegration<CleverTapAPI>
                             item.put("image_url", product.get("image_url"));
                         }
 
+                        // brand
+                        if (product.has("brand")) {
+                            item.put("brand", product.get("brand"));
+                        }
+
                         // finally add the product
                         if (!isEmpty(item)) {
                             productsList.add(item);
