@@ -3,12 +3,11 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion '30.0.2'
+    compileSdkVersion 31
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 30
+        minSdkVersion 19
+        targetSdkVersion 31
         versionCode 1
         versionName '1.0.1'
     }
@@ -27,9 +26,15 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.annotation:annotation:1.1.0'
     // rudder core sdk
-    compileOnly 'com.rudderstack.android.sdk:core:1.1.0'
+    implementation 'com.rudderstack.android.sdk:core:[1.7.0, 1.8.0)'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.clevertap.android:clevertap-android-sdk:4.0.0'
 }
 
-apply from: './maven.gradle'
+ext {
+    PUBLISH_GROUP_ID = 'com.rudderstack.android.integration'
+    PUBLISH_VERSION = '2.0.3'
+    PUBLISH_ARTIFACT_ID = 'firebase'
+}
+
+apply from: "${rootProject.projectDir}/scripts/publish-module.gradle"
