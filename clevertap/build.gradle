@@ -8,8 +8,6 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 31
-        versionCode 1
-        versionName '1.0.1'
     }
 
     buildTypes {
@@ -33,8 +31,8 @@ dependencies {
 
 ext {
     PUBLISH_GROUP_ID = 'com.rudderstack.android.integration'
-    PUBLISH_VERSION = '2.0.3'
-    PUBLISH_ARTIFACT_ID = 'firebase'
+    PUBLISH_VERSION = '1.0.2'
+    PUBLISH_ARTIFACT_ID = 'clevertap'
 }
 
 apply from: "${rootProject.projectDir}/scripts/publish-module.gradle"
