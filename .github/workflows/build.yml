@@ -39,7 +39,7 @@ jobs:
             ${{ runner.os }}-gradle-core-
 
       - name: Run Tests
-        run: ./gradlewclevertap:test
+        run: ./gradlew clevertap:test
 
       - name: Generate coverage report
         run: ./gradlew clevertap:codeCoverageReport
