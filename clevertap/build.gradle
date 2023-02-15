@@ -32,4 +32,12 @@ dependencies {
     implementation 'com.clevertap.android:clevertap-android-sdk:4.0.0'
 }
 
-apply from: './maven.gradle'
+ext {
+    PUBLISH_GROUP_ID = 'com.rudderstack.android.integration'
+    PUBLISH_VERSION = '2.0.0'
+    PUBLISH_ARTIFACT_ID = 'clevertap'
+}
+
+apply from: rootProject.file('gradle/mvn-publish.gradle')
+apply from: rootProject.file('gradle/codecov.gradle')
+
