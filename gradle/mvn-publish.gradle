@@ -6,7 +6,7 @@ publishing {
         release(MavenPublication) {
             // The coordinates of the library, being set from variables that
             // we'll set up in a moment
-            groupId GROUP
+            groupId GROUPz̄
             artifactId POM_ARTIFACT_ID
             version getVersionName()
 
