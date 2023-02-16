@@ -26,7 +26,8 @@
 <!--            android:name="CLEVERTAP_TOKEN"-->
 <!--            android:value="XXX-XXX"/>-->
             
-        <activity android:name="com.rudderstack.android.sample.kotlin.MainActivity">
+        <activity android:name="com.rudderstack.android.sample.kotlin.MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
