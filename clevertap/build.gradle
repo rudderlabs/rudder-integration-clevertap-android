@@ -3,12 +3,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion '30.0.2'
+    compileSdkVersion 31
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 30
+        minSdkVersion 19
+        targetSdkVersion 31
+        buildConfigField("String", "VERSION_NAME", "\"${VERSION_NAME}\"")
     }
 
     buildTypes {
