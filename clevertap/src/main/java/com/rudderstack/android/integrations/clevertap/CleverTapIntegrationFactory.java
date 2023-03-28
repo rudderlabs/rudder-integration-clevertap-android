@@ -210,15 +210,16 @@ public class CleverTapIntegrationFactory extends RudderIntegration<CleverTapAPI>
                     try {
                         if (eventName != null) {
                             Map<String, Object> eventProperties = element.getProperties();
-                            if (eventName.equals("Order Completed") && !isEmpty(eventProperties)) {
+                            if (eventName.equals("Order Completed")) {
                                 handleECommerceEvent(eventProperties);
-                                return;
+                            } else {
+                                if (isEmpty(eventProperties)) {
+                                    this.cleverTap.pushEvent(eventName);
+                                } else {
+                                    this.cleverTap.pushEvent(eventName, eventProperties);
+                                }
                             }
-                            if (isEmpty(eventProperties)) {
-                                this.cleverTap.pushEvent(eventName);
-                                return;
-                            }
-                            this.cleverTap.pushEvent(eventName, eventProperties);
+
                         }
                     } catch (Exception e) {
                         RudderLogger.logError(e);
@@ -338,19 +339,23 @@ public class CleverTapIntegrationFactory extends RudderIntegration<CleverTapAPI>
     }
 
     private void handleECommerceEvent(Map<String, Object> eventProperties) {
+        if (eventProperties == null) {
+            return;
+        }
         HashMap<String, Object> chargeDetails = new HashMap<>();
-        if (eventProperties.containsKey("revenue")) {
-            chargeDetails.put("Amount", getRevenue(eventProperties.get("revenue")));
-        }
-        if (eventProperties.containsKey("order_id")) {
-            chargeDetails.put("Charged ID", eventProperties.get("order_id"));
-        }
-        for (Map.Entry<String, Object> entry : eventProperties.entrySet()) {
-            if (!entry.getKey().equals("products") && !entry.getKey().equals("revenue") && !entry.getKey().equals("order_id") ) {
-                chargeDetails.put(entry.getKey(), entry.getValue());
+        ArrayList<HashMap<String, Object>> items = new ArrayList<>();
+        for(Map.Entry<String, Object> entrySet: eventProperties.entrySet()) {
+            if (entrySet.getKey().equals("products")) {
+                if (entrySet.getValue() != null && entrySet.getValue() instanceof List<?>)
+                    items = getProductsList((List<Map<String, Object>>)entrySet.getValue());
+            } else if (entrySet.getKey().equals("revenue")) {
+                chargeDetails.put("Amount", getRevenue(entrySet.getValue()));
+            } else if (entrySet.getKey().equals("order_id")) {
+                chargeDetails.put("Charged ID", entrySet.getValue());
+            } else {
+                chargeDetails.put(entrySet.getKey(), entrySet.getValue());
             }
         }
-        ArrayList<HashMap<String, Object>> items = getProductsList(eventProperties);
         this.cleverTap.pushChargedEvent(chargeDetails, items);
     }
 
@@ -362,110 +367,29 @@ public class CleverTapIntegrationFactory extends RudderIntegration<CleverTapAPI>
         return 0;
     }
 
-    private ArrayList<HashMap<String, Object>> getProductsList(Map<String, Object> eventProperties) {
+    private ArrayList<HashMap<String, Object>> getProductsList(List<Map<String, Object>> products) {
         ArrayList<HashMap<String, Object>> productsList = new ArrayList<>();
-        if (eventProperties.containsKey("products")) {
-            try {
-                JSONArray products = getProductsJSONArray(eventProperties.get("products"));
-                if (!isEmpty(products)) {
-                    for (int i = 0; i < products.length(); i++) {
-                        JSONObject product = (JSONObject) products.get(i);
-                        HashMap<String, Object> item = new HashMap<>();
-
-                        // productId
-                        if (product.has("productId")) {
-                            item.put("id", product.get("productId"));
-                        } else {
-                            if (product.has("product_id")) {
-                                item.put("id", product.get("product_id"));
-                            }
-                        }
-
-                        // product name
-                        if (product.has("name")) {
-                            item.put("name", product.get("name"));
-                        }
-
-                        // SKU
-                        if (product.has("sku")) {
-                            item.put("sku", product.get("sku"));
-                        }
-
-                        // price
-                        if (product.has("price")) {
-                            item.put("price", product.get("price"));
-                        }
-
-                        // quantity
-                        if (product.has("quantity")) {
-                            item.put("quantity", product.get("quantity"));
-                        }
-
-                        // category
-                        if (product.has("category")) {
-                            item.put("category", product.get("category"));
-                        }
-
-                        // url
-                        if (product.has("url")) {
-                            item.put("url", product.get("url"));
-                        }
-
-                        // image_url
-                        if (product.has("image_url")) {
-                            item.put("image_url", product.get("image_url"));
-                        }
-
-                        // brand
-                        if (product.has("brand")) {
-                            item.put("brand", product.get("brand"));
-                        }
-
-                        // finally add the product
-                        if (!isEmpty(item)) {
-                            productsList.add(item);
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                RudderLogger.logError(e);
-            }
-        }
-        return productsList;
-    }
-
-    private JSONArray getProductsJSONArray(Object object) {
-        if (object == null) {
-            return null;
-        }
-        if (object instanceof JSONArray) {
-            return (JSONArray) object;
-        }
-        if (object instanceof List){
-            ArrayList<Object> arrayList = new ArrayList<>((Collection<?>) object);
-            return new JSONArray(arrayList);
-        }
-        if (object instanceof LinkedHashMap) {
-            LinkedHashMap product = (LinkedHashMap) object;
-            JSONObject productJsonObject = new JSONObject();
-            for (Object key: product.keySet()) {
-                try {
-                    productJsonObject.put((String) key, product.get(key));
-                } catch (JSONException e) {
-                    RudderLogger.logDebug("Error while converting the Products value to JSONArray type");
-                }
-            }
-            if (!isEmpty(productJsonObject)) {
-                return new JSONArray().put(productJsonObject);
-            }
-            return null;
+        if (products == null || products.size() == 0) {
+            return productsList;
         }
         try {
-            return new JSONArray((ArrayList) object);
+            for (Map<String, Object> product: products) {
+                HashMap<String, Object> item = new HashMap<>();
+                for(Map.Entry<String, Object> entrySet: product.entrySet()) {
+                    if (entrySet.getKey().equals("product_id")) {
+                        item.put("id", entrySet.getValue());
+                    } else {
+                        item.put(entrySet.getKey(), entrySet.getValue());
+                    }
+                }
+                if (!isEmpty(item)) {
+                    productsList.add(item);
+                }
+            }
         } catch (Exception e) {
-            RudderLogger.logDebug("Error while converting the products: "+ object +" to JSONArray type");
+            RudderLogger.logError(e);
         }
-        return null;
+        return productsList;
     }
 
     public static boolean isEmpty(Object value) {

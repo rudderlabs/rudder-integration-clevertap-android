@@ -6,54 +6,136 @@
     android:layout_height="match_parent"
     tools:context="com.rudderstack.android.sample.kotlin.MainActivity">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Count: "
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <Button
-        android:id="@+id/identify"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:layout_marginBottom="32dp"
+        android:id="@+id/btn"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="10dp"
+        android:onClick="onButtonTap"
         android:text="Identify"
-        app:layout_constraintBottom_toTopOf="@+id/track"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
-
-    <Button
-        android:id="@+id/track"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:layout_marginBottom="195dp"
-        android:text="Track"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/identify"
-        app:layout_constraintStart_toStartOf="@+id/identify"
-        app:layout_constraintTop_toBottomOf="@+id/identify" />
-
-    <Button
-        android:id="@+id/screen"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="162dp"
-        android:layout_marginLeft="162dp"
-        android:layout_marginTop="270dp"
-        android:layout_marginEnd="161dp"
-        android:layout_marginRight="161dp"
-        android:layout_marginBottom="38dp"
-        android:text="Screen"
-        app:layout_constraintBottom_toTopOf="@+id/textView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btn2"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="5dp"
+        android:onClick="onButtonTap"
+        android:text="Update Identify"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn" />
+
+    <Button
+        android:id="@+id/btn3"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="5dp"
+        android:onClick="onButtonTap"
+        android:text="Order Completed event without any property"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn2" />
+
+    <Button
+        android:id="@+id/btn4"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="5dp"
+        android:onClick="onButtonTap"
+        android:text="Order Completed event with properties but without order_id"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn3" />
+
+    <Button
+        android:id="@+id/btn5"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="5dp"
+        android:onClick="onButtonTap"
+        android:text="Order Completed event with properties along order_id but without products"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn4" />
+
+    <Button
+        android:id="@+id/btn6"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="5dp"
+        android:onClick="onButtonTap"
+        android:text="Order Completed event with properties along 1 product but without order_id"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn5" />
+
+    <Button
+        android:id="@+id/btn7"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="5dp"
+        android:onClick="onButtonTap"
+        android:text="Order Completed event with properties with 1 product and order_id"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn6" />
+
+    <Button
+        android:id="@+id/btn8"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="5dp"
+        android:onClick="onButtonTap"
+        android:text="Order Completed event with properties with 2 products and order_id"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn7" />
+
+    <Button
+        android:id="@+id/btn9"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="5dp"
+        android:onClick="onButtonTap"
+        android:text="Custom event name with properties"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn8" />
+
+    <Button
+        android:id="@+id/btn10"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="5dp"
+        android:onClick="onButtonTap"
+        android:text="Custom event name without properties"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn9" />
+
+    <Button
+        android:id="@+id/btn11"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="5dp"
+        android:onClick="onButtonTap"
+        android:text="Screen without properties"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn10" />
+
+    <Button
+        android:id="@+id/btn12"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="5dp"
+        android:onClick="onButtonTap"
+        android:text="Screen"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn11" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
