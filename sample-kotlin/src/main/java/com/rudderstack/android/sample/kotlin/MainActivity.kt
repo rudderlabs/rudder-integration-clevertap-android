@@ -39,8 +39,6 @@ class MainActivity : AppCompatActivity() {
                         .put("Tz", "Asia/Kolkata"),
                     null
                 )
-            R.id.btn3 ->
-                rudderClient.track("Order Completed")
             R.id.btn4 ->
                 rudderClient.track("Order Completed", RudderProperty()
                     .putValue("revenue", 123)
@@ -116,12 +114,12 @@ class MainActivity : AppCompatActivity() {
             R.id.btn10 ->
                 rudderClient.track("New Track event")
             R.id.btn11 ->
-                rudderClient.track("Home", RudderProperty()
+                rudderClient.screen("Home", RudderProperty()
                     .putValue("key_1", "value_1")
                     .putValue("key_2", "value_2")
                 )
             R.id.btn12 ->
-                rudderClient.track("Home")
+                rudderClient.screen("Home")
         }
     }
 }

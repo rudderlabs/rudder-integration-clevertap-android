@@ -12,7 +12,11 @@ buildscript {
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+
+Properties properties = new Properties()
+if (project.rootProject.file('sample-kotlin/local.properties').canRead()) {
+    properties.load(project.rootProject.file("sample-kotlin/local.properties").newDataInputStream())
+}
 
 android {
     compileSdkVersion 33
@@ -23,6 +27,11 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+
+        buildConfigField("String", "DATA_PLANE_URL", properties.getProperty('dataplaneUrl', "\"\""))
+        buildConfigField("String", "CONTROL_PLANE_URL", properties.getProperty('controlplaneUrl', '"https://api.rudderstack.com"'))
+        buildConfigField("String", "WRITE_KEY", properties.getProperty('writeKey', "\"\""))
     }
     buildTypes {
         release {
@@ -46,9 +55,9 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
-    implementation 'com.rudderstack.android.sdk:core:[1.0,2.0)'
+    implementation 'com.rudderstack.android.sdk:core:[1.23.1,2.0)'
     implementation project(':clevertap')
-    implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'com.google.code.gson:gson:2.10.1'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test:runner:1.5.2'
@@ -58,6 +67,7 @@ dependencies {
     // implementation 'com.clevertap.android:clevertap-android-sdk:4.0.0'
     // implementation 'com.google.firebase:firebase-messaging:20.2.4'
 
+    implementation 'com.android.support:multidex:1.0.3'
 }
 // To be added only when using the Push Notification Service of CleverTap
 // apply plugin: 'com.google.gms.google-services'
