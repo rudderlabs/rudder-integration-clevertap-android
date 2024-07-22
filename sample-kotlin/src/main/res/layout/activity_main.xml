@@ -29,17 +29,6 @@
         app:layout_constraintTop_toBottomOf="@+id/btn" />
 
     <Button
-        android:id="@+id/btn3"
-        android:layout_width="0dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="5dp"
-        android:onClick="onButtonTap"
-        android:text="Order Completed event without any property"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn2" />
-
-    <Button
         android:id="@+id/btn4"
         android:layout_width="0dp"
         android:layout_height="60dp"
@@ -48,7 +37,7 @@
         android:text="Order Completed event with properties but without order_id"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn3" />
+        app:layout_constraintTop_toBottomOf="@+id/btn2" />
 
     <Button
         android:id="@+id/btn5"

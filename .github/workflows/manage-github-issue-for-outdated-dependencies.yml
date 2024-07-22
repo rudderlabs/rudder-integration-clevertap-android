@@ -19,7 +19,7 @@ jobs:
           outdated-dependency-names: "com.clevertap.android:clevertap-android-sdk"
           directory: "clevertap/build.gradle"
           title: "fix: update Clevertap SDK to the latest version"
-          assignee: "desusai7"
+          assignee: "@rudderlabs/sdk-android"
           labels: "outdatedDependency"
           color: "FBCA04"
         env:
