@@ -3,11 +3,11 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 31
+    compileSdk 33
 
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 31
+        targetSdk 33
         buildConfigField("String", "VERSION_NAME", "\"${VERSION_NAME}\"")
     }
 
@@ -25,14 +25,12 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // RudderStack SDK
-    compileOnly 'com.rudderstack.android.sdk:core:[1.12,2.0)'
+    compileOnly 'com.rudderstack.android.sdk:core:[1.23.3, 2.0.0)'
     // CleverTap SDK
-    implementation 'com.clevertap.android:clevertap-android-sdk:[4.6,5.0)'
+    implementation 'com.clevertap.android:clevertap-android-sdk:[6.2.1, 7.0.0)'
 
-    implementation 'androidx.annotation:annotation:1.6.0'
-    implementation 'com.google.code.gson:gson:2.8.9'
-
-    testImplementation 'com.rudderstack.android.sdk:core:[1.12,2.0)'
+    implementation 'androidx.annotation:annotation:1.7.0'
+    implementation 'com.google.code.gson:gson:2.10.1'
 }
 
 apply from: rootProject.file('gradle/mvn-publish.gradle')

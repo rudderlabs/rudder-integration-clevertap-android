@@ -73,4 +73,4 @@ jobs:
           github_token: ${{ secrets.PAT }}
           pr_title: "chore(release): pulling ${{ steps.create-release.outputs.branch_name }} into master"
           pr_body:  ":crown: *An automated PR*"
-          pr_reviewer: 'itsdebs'
+          pr_reviewer: '@rudderlabs/sdk-android'
