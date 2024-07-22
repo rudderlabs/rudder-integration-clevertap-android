@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.2.0 (2024-07-22)
+
+
+### Features
+
+* update CleverTap SDK to v6.2.1 ([c3dba0c](https://github.com/rudderlabs/rudder-integration-clevertap-android/commit/c3dba0cb26fd7bd074fe51200c7c7c737458ea8d))
+
 ## 1.1.0 (2023-03-28)
 
 
