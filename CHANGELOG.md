@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.3.0 (2025-04-09)
+
+
+### Features
+
+* bump clevertap version to 7.3.1 ([#37](https://github.com/rudderlabs/rudder-integration-clevertap-android/issues/37)) ([f29fa96](https://github.com/rudderlabs/rudder-integration-clevertap-android/commit/f29fa96cf1f8fe9ae95e25fddcb4ddc770ee3d7b))
+
 ## 1.2.0 (2024-07-22)
 
 
