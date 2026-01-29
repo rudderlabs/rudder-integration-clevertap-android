@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read # minimal permissions for GITHUB_TOKEN, actual operations use App Token
-    if: ${{ github.event_name == 'workflow_dispatch' }} || (startsWith(github.event.pull_request.head.ref, 'release/') && github.event.pull_request.merged == true) # only merged pull requests must trigger this job
+    if: github.event_name == 'workflow_dispatch' || (startsWith(github.event.pull_request.head.ref, 'release/') && github.event.pull_request.merged == true) # only merged pull requests must trigger this job
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@95d9a5deda9de15063e7595e9719c11c38c90ae2 # v2.13.2
@@ -35,13 +35,16 @@ jobs:
 
       - name: Extract version from branch name (for release branches)
         id: extract-version
+        env:
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          VERSION_INPUT: ${{ github.event.inputs.version }}
         run: |
-          BRANCH_NAME="${{ github.event.pull_request.head.ref }}"
-          if [ "$BRANCH_NAME" = "" ]; then BRANCH_NAME=${{ github.event.inputs.version }}
+          BRANCH_NAME="${PR_HEAD_REF}"
+          if [ "$BRANCH_NAME" = "" ]; then BRANCH_NAME="${VERSION_INPUT}"
           fi
           echo "BRANCH_NAME considered: ${BRANCH_NAME}"
           VERSION=${BRANCH_NAME#release/}
-          
+
           echo "release_version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Checkout
@@ -66,6 +69,7 @@ jobs:
         id: create_release
         env:
           CONVENTIONAL_GITHUB_RELEASER_TOKEN: ${{ steps.generate-token.outputs.token }}
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
           git tag -a v${{ steps.extract-version.outputs.release_version }} -m "chore: release v${{ steps.extract-version.outputs.release_version }}"
           git push origin refs/tags/v${{ steps.extract-version.outputs.release_version }}
