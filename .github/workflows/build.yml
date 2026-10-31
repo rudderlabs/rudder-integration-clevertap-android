@@ -8,8 +8,7 @@ on:
     types: [ 'opened', 'reopened', 'edited', 'synchronize' ]
   workflow_dispatch:
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   cancel_previous:
@@ -28,6 +27,8 @@ jobs:
           workflow_id: ${{ github.event.workflow.id }}
 
   clevertap-test:
+    permissions:
+      contents: read # actions/checkout
     needs: cancel_previous
     runs-on: ubuntu-latest
 
@@ -39,6 +40,8 @@ jobs:
 
       - name: Checkout source branch
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          persist-credentials: false
 
       - name: Set up JDK 17
         uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
