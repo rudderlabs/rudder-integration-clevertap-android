@@ -11,6 +11,8 @@ on:
       version:
         required: true
 
+permissions: {}
+
 jobs:
   release:
     name: Publish new release
@@ -49,6 +51,7 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        # Keep persisted credentials: a later step pushes the release tag with git.
         with:
           fetch-depth: 0
           token: ${{ steps.generate-token.outputs.token }}

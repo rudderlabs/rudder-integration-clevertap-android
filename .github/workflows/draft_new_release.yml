@@ -3,8 +3,7 @@ name: Draft new release
 on:
   workflow_dispatch
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   draft-new-release:
@@ -31,6 +30,7 @@ jobs:
 
       - name: Checkout source branch
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        # Keep persisted credentials: github-signed-commit runs git push when branch-name differs from the run branch.
         with:
           fetch-depth: 0
           token: ${{ steps.generate-token.outputs.token }}
@@ -95,7 +95,7 @@ jobs:
             gradle.properties
 
       - name: Create pull request into master
-        uses: repo-sync/pull-request@7e79a9f5dc3ad0ce53138f01df2fad14a04831c5 #v2
+        uses: repo-sync/pull-request@7e79a9f5dc3ad0ce53138f01df2fad14a04831c5 # v2.12.1
         with:
           source_branch: ${{ steps.create-release.outputs.branch_name }}
           destination_branch: 'master'

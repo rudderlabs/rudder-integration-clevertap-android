@@ -5,11 +5,12 @@ on:
     branches: [ 'master' ]
     types: [ 'opened', 'reopened', 'edited', 'synchronize' ]
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   snapshot:
+    permissions:
+      contents: read # actions/checkout
     runs-on: ubuntu-latest
     environment: deployment
     steps:
@@ -20,6 +21,8 @@ jobs:
 
       - name: Checkout source branch
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
         with:
